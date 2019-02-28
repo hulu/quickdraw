@@ -25,6 +25,7 @@ qdInternal.errors.QuickdrawError = class QuickdrawError
 
         # Additional information
         @_current = {
+            ancestorPath : null
             duringBinding : qdInternal.state.current.element isnt null
             error : originalError
             context : null
@@ -64,6 +65,12 @@ qdInternal.errors.QuickdrawError = class QuickdrawError
     setViewModel: (viewModel) ->
         return unless viewModel?
         @_current.viewModel = qdInternal.models.unwrap(viewModel)
+        return
+
+    # Set the ancestor path of the node throwing this error (if applicable)
+    # @param [String[]] ancestorPath array of ancestor identifiers
+    setAncestorPath: (ancestorPath) ->
+        @_current.ancestorPath = ancestorPath
         return
 
     # @return [Object] all known details about the error

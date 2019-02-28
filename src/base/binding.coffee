@@ -64,10 +64,22 @@ qdInternal.binding = {
             # pass the real dom node to the binding function as the $element value
             return bindingFunction(bindingContext, qdInternal.dom.unwrap(domNode))
         catch err
+            ancestorPath = @_getNodeAncestry(domNode)
             error = new QuickdrawError("'#{err.message}' in binding '#{domNode.getAttribute(qd.getConfig('bindingAttribute'))}'", err)
             error.setBindingContext(bindingContext)
+            error.setAncestorPath(ancestorPath)
             qdInternal.errors.throw(error)
             return null
+
+    # Gets the tagName and className for all nodes in the ancestry chain of this VirtualDomNode
+    # @param [VirtualDomNode] domNode the node to calculate the ancestry chain of
+    # @return [String] the ancestry chain of the provide domNode
+    _getNodeAncestry : (domNode) ->
+        ancestorPath = []
+        while domNode?
+            ancestorPath.push(domNode.getProperty('tagName').toLowerCase() + "." + domNode.getProperty('className').replace(" ", "."))
+            domNode = domNode.getParentNode()
+        return ancestorPath
 
     # Applies a recursive binding with the given binding context
     # @note this should not be called from outside of quickdraw or a
