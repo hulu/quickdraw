@@ -1,6 +1,6 @@
 {
   "name": "quickdraw-dom",
-  "version": "0.10.18",
+  "version": "0.11.0",
   "description": "A MVVM data binding framework designed for speed and efficiency on living room devices",
   "author": "Hulu Living Room",
   "scripts": {

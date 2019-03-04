@@ -63,9 +63,11 @@ describe("Quickdraw.Internal.Binding", ->
             )
 
             errorSpy = sandbox.qd._.errors.throw = sinon.spy()
+            nodePathSpy = sandbox.qd._.binding._getNodePath = sinon.spy()
 
             assert.isNull(sandbox.qd._.binding.getEvaluatedBindingObject(virtualNode, bindingContext), "Should return null if an error is thrown")
 
+            assert.isTrue(nodePathSpy.called, "Should have called _getNodePath")
             assert.isTrue(errorSpy.called, "Should have thrown an error through quickdraw error class")
         )
 
@@ -75,6 +77,32 @@ describe("Quickdraw.Internal.Binding", ->
             functionSpy = sinon.stub(sandbox.qd._.binding, "getBindingFunction", -> return -> fakeBindingObject)
 
             assert.equal(sandbox.qd._.binding.getEvaluatedBindingObject({}, {}), fakeBindingObject, "Should correctly return binding object")
+        )
+    )
+
+    describe("_getNodePath(domNode)", ->
+        it("returns an array of tagNames, ids and classNames of nodes in top-down order", ->
+            rawParentNode = sandbox.document.createElement('div')
+            rawParentNode.id = "id"
+            virtualParentNode = sandbox.qd._.dom.virtualize(rawParentNode)
+
+            rawChildNode = sandbox.document.createElement('div')
+            rawChildNode.className = "child"
+            rawChildNode.id = "childId"
+            virtualChildNode = virtualParentNode.appendChild(rawChildNode)
+
+            rawGrandChildNode = sandbox.document.createElement('div')
+            rawGrandChildNode.className = "grandChild"
+            virtualGrandChildNode = virtualChildNode.appendChild(rawGrandChildNode)
+
+            assert.deepEqual(sandbox.qd._.binding._getNodePath(virtualGrandChildNode), ['div#id', 'div#childId.child', 'div.grandChild'])
+        )
+
+        it("returns information about the node if it doesn't have any parents", ->
+            rawNode = sandbox.document.createElement('div')
+            virtualNode = sandbox.qd._.dom.virtualize(rawNode)
+
+            assert.deepEqual(sandbox.qd._.binding._getNodePath(virtualNode), ['div'])
         )
     )
 
