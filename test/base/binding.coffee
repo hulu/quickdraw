@@ -63,9 +63,11 @@ describe("Quickdraw.Internal.Binding", ->
             )
 
             errorSpy = sandbox.qd._.errors.throw = sinon.spy()
+            nodePathSpy = sandbox.qd._.binding._getNodePath = sinon.spy()
 
             assert.isNull(sandbox.qd._.binding.getEvaluatedBindingObject(virtualNode, bindingContext), "Should return null if an error is thrown")
 
+            assert.isTrue(nodePathSpy.called, "Should have called _getNodePath")
             assert.isTrue(errorSpy.called, "Should have thrown an error through quickdraw error class")
         )
 
@@ -75,6 +77,21 @@ describe("Quickdraw.Internal.Binding", ->
             functionSpy = sinon.stub(sandbox.qd._.binding, "getBindingFunction", -> return -> fakeBindingObject)
 
             assert.equal(sandbox.qd._.binding.getEvaluatedBindingObject({}, {}), fakeBindingObject, "Should correctly return binding object")
+        )
+    )
+
+    describe("_getNodePath(domNode)", ->
+        it("returns an array of tagNames, ids and classNames of nodes in top-down order", ->
+            rawParentNode = sandbox.document.createElement('div')
+            rawParentNode.id = "id"
+            virtualParentNode = sandbox.qd._.dom.virtualize(rawParentNode)
+
+            rawChildNode = sandbox.document.createElement('div')
+            rawChildNode.className = "child"
+            rawChildNode.id = "childId"
+            virtualChildNode = virtualParentNode.appendChild(rawChildNode)
+
+            assert.deepEqual(sandbox.qd._.binding._getNodePath(virtualChildNode), ['div#id', 'div#childId.child'])
         )
     )
 
