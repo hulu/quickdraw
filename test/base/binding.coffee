@@ -91,7 +91,18 @@ describe("Quickdraw.Internal.Binding", ->
             rawChildNode.id = "childId"
             virtualChildNode = virtualParentNode.appendChild(rawChildNode)
 
-            assert.deepEqual(sandbox.qd._.binding._getNodePath(virtualChildNode), ['div#id', 'div#childId.child'])
+            rawGrandChildNode = sandbox.document.createElement('div')
+            rawGrandChildNode.className = "grandChild"
+            virtualGrandChildNode = virtualChildNode.appendChild(rawGrandChildNode)
+
+            assert.deepEqual(sandbox.qd._.binding._getNodePath(virtualGrandChildNode), ['div#id', 'div#childId.child', 'div.grandChild'])
+        )
+
+        it("returns information about the node if it doesn't have any parents", ->
+            rawNode = sandbox.document.createElement('div')
+            virtualNode = sandbox.qd._.dom.virtualize(rawNode)
+
+            assert.deepEqual(sandbox.qd._.binding._getNodePath(virtualNode), ['div'])
         )
     )
 
