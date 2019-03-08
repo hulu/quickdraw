@@ -52,6 +52,7 @@ qdInternal.errors.QuickdrawError = class QuickdrawError
     # @param [DomNode] domNode in use during the error
     setDomNode: (domNode) ->
         @_current.domNode = qdInternal.dom.unwrap(domNode)
+        @setNodePath(qdInternal.dom.getNodePath(domNode))
         return
 
     # Set the observable that caused this error (if applicable)

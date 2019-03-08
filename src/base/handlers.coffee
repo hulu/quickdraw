@@ -58,7 +58,15 @@ qd.registerBindingHandler = (keyword, handler, follows = [], override = false) -
                 try
                     result = callback.apply(qdInternal, args)
                 catch err
-                    qdInternal.errors.throw(new QuickdrawError("Error in '#{type}' of '#{keyword}' binding handler: \"#{err.message}\"", err))
+                    # these two handlers pass the node as the second argument
+                    if type in ['initialize', 'update']
+                        node = args[1]
+                    # cleanup passes the node as the only argument
+                    else
+                        node = args[0]
+                    error = new QuickdrawError("Error in '#{type}' of '#{keyword}' binding handler: \"#{err.message}\"", err)
+                    error.setDomNode(node)
+                    qdInternal.errors.throw(error)
                 finally
                     # restore the previous state before this function call
                     stateMemento()
