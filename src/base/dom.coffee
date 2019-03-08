@@ -16,7 +16,7 @@ qdInternal.dom = {
     # Takes the given dom tree and constructs a virtualized wrapper around
     # it that can be traversed for bindings. This wrapper is used to allow
     # bindings to quickly compute the updates they wish to apply and transparently
-    # apply changes to the dom nodes only after all bindings have been 
+    # apply changes to the dom nodes only after all bindings have been
     # evaluated
     virtualize: (domNode) ->
         # if the given node is a virtual node just return it
@@ -37,6 +37,19 @@ qdInternal.dom = {
     importNode: (document, node, deep = true) ->
         virtualNode = qdInternal.dom.virtualize(node)
         return virtualNode.cloneNode(deep, document)
+
+    # Gets the tagName and className for all nodes in the parent chain of this VirtualDomNode
+    # @param [DomNode] domNode the node to calculate the parent chain of
+    # @return [String] the parent chain of the provide domNode
+    getNodePath : (domNode) ->
+        nodePath = []
+        while domNode?
+            domNode = @virtualize(domNode)
+            id = domNode.getProperty('id') && "##{domNode.getProperty('id')}"
+            className = domNode.getProperty('className') && ".#{domNode.getProperty('className').replace(" ", ".")}"
+            nodePath.push("#{domNode.getProperty('tagName').toLowerCase()}#{id}#{className}")
+            domNode = domNode.getParentNode()
+        return nodePath.reverse()
 
     # A virtual dom node that wraps a real dom node allowing for changes
     # to the dom node to be staged together before actually being made to
@@ -191,10 +204,10 @@ qdInternal.dom = {
         clearValues: ->
             # clear the storage
             qdInternal.storage.clearValues(@_state.rawNode)
-            
+
             # add this virtual node back to the dom node, only a dispose should disassociate it
             qdInternal.storage.setInternalValue(@_state.rawNode, 'virtual', @)
-            
+
             return
 
         # @param [String] name the name of the property to return
@@ -305,7 +318,7 @@ qdInternal.dom = {
 
             virtualChild = qdInternal.dom.virtualize(child)
             index = @_changes.children.indexOf(virtualChild)
-            
+
             # error if the given child is not a child of this node
             if index is -1
                 return qdInternal.errors.throw(new QuickdrawError("Given element is not a child of this node"))

@@ -36,6 +36,32 @@ describe("Quickdraw.Internal.Dom", ->
         )
     )
 
+    describe("getNodePath(domNode)", ->
+        it("returns an array of tagNames, ids and classNames of nodes in top-down order", ->
+            rawParentNode = sandbox.document.createElement('div')
+            rawParentNode.id = "id"
+            virtualParentNode = sandbox.qd._.dom.virtualize(rawParentNode)
+
+            rawChildNode = sandbox.document.createElement('div')
+            rawChildNode.className = "child"
+            rawChildNode.id = "childId"
+            virtualChildNode = virtualParentNode.appendChild(rawChildNode)
+
+            rawGrandChildNode = sandbox.document.createElement('div')
+            rawGrandChildNode.className = "grandChild"
+            virtualGrandChildNode = virtualChildNode.appendChild(rawGrandChildNode)
+
+            assert.deepEqual(sandbox.qd._.dom.getNodePath(virtualGrandChildNode), ['div#id', 'div#childId.child', 'div.grandChild'])
+        )
+
+        it("returns information about the node if it doesn't have any parents", ->
+            rawNode = sandbox.document.createElement('div')
+            virtualNode = sandbox.qd._.dom.virtualize(rawNode)
+
+            assert.deepEqual(sandbox.qd._.dom.getNodePath(virtualNode), ['div'])
+        )
+    )
+
     describe("VirtualDomNode", ->
         describe("constructor(domNode, parentNode)", ->
             it("A given dom node is correctly wrapped", ->
@@ -498,7 +524,7 @@ describe("Quickdraw.Internal.Dom", ->
                 properties = {}
                 attributes = {}
                 styles = {}
-                
+
                 virtual = new sandbox.qd._.dom.VirtualDomNode(node)
                 virtual._state.hasModifications = true
                 virtual._changes = {

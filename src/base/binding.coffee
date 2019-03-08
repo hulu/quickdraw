@@ -64,24 +64,11 @@ qdInternal.binding = {
             # pass the real dom node to the binding function as the $element value
             return bindingFunction(bindingContext, qdInternal.dom.unwrap(domNode))
         catch err
-            nodePath = @_getNodePath(domNode)
             error = new QuickdrawError("'#{err.message}' in binding '#{domNode.getAttribute(qd.getConfig('bindingAttribute'))}'", err)
             error.setBindingContext(bindingContext)
-            error.setNodePath(nodePath)
+            error.setDomNode(domNode)
             qdInternal.errors.throw(error)
             return null
-
-    # Gets the tagName and className for all nodes in the parent chain of this VirtualDomNode
-    # @param [VirtualDomNode] domNode the node to calculate the parent chain of
-    # @return [String] the parent chain of the provide domNode
-    _getNodePath : (domNode) ->
-        nodePath = []
-        while domNode?
-            id = domNode.getProperty('id') && "##{domNode.getProperty('id')}"
-            className = domNode.getProperty('className') && ".#{domNode.getProperty('className').replace(" ", ".")}"
-            nodePath.push("#{domNode.getProperty('tagName').toLowerCase()}#{id}#{className}")
-            domNode = domNode.getParentNode()
-        return nodePath.reverse()
 
     # Applies a recursive binding with the given binding context
     # @note this should not be called from outside of quickdraw or a
