@@ -1,1 +1,1 @@
-declare module "quickdrawjs";
+declare module "@hulu/quickdraw";
