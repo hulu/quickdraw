@@ -8,7 +8,6 @@ npmlog    = require("npm/node_modules/npmlog")
 
 # gulp related includes
 gulp      = require("gulp")
-bump      = require("gulp-bump")
 coffee    = require("gulp-coffee")
 coffeeCov = require("gulp-coffee-coverage")
 concat    = require("gulp-concat")
@@ -149,16 +148,7 @@ gulp.task("minify", ["compile"], ->
         .pipe(gulp.dest(BUILD_FOLDER))
 )
 
-gulp.task("bump", ["minify", "test"], ->
-    return gulp.src("./package.json")
-        .pipe(bump({
-            type : args.type
-            preid : 'rc'
-        }))
-        .pipe(gulp.dest("./"))
-)
-
-gulp.task("release:organize", ["bump"], ->
+gulp.task("release:organize", ["test"], ->
     return gulp.src(["#{BUILD_FOLDER}/#{COMPILED_FILE}", "#{BUILD_FOLDER}/#{MINIFIED_FILE}", PATHS.typeDeclaration])
         .pipe(getHeaderAddition())
         .pipe(gulp.dest(RELEASE_FOLDER))
