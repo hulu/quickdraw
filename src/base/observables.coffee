@@ -235,6 +235,7 @@ qdInternal.observables = {
         obs.isBound = @hasDependencies
         obs.immediate = @helpers.immediate
         obs.silent = @helpers.silent
+        obs.addComputedDependency = @addComputedDependency
 
         # since not can be passed alone in a binding string we
         # need to pass a closure, this will be removed once not
