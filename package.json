@@ -33,7 +33,7 @@
     "mocha": "~2.3.3",
     "mocha-lcov-reporter": "1.0.0",
     "mocha-multi": "~0.7.2",
-    "npm": "^3.3.12",
+    "npm": "^6.14.6",
     "sinon": "~1.17.2"
   }
 }
