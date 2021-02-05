@@ -30,6 +30,7 @@ declare module "@hulu/quickdraw" {
         isBound(): boolean;
         on(event: string, callback: Function): void;
         addComputedDependency(obs: Observable<T>): void;
+        immediate(value: T): void;
     }
 
     interface ObservableArray<T> {
