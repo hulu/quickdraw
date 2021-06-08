@@ -59,6 +59,7 @@ dispatchEvent = (event) ->
         event.stopPropagation()
 
         context = @context.get(currentTarget)
+
         # run the callback, look for explicit truth return
         unless callback(context, event) is true
             # cancel the default event action
@@ -79,11 +80,11 @@ registerGlobalHandler = (node, eventName, callback) ->
         globalRegistry[eventName] = (event) => dispatchEvent.call(@, event)
         document.addEventListener(eventName, globalRegistry[eventName], true)
 
-        # store callback on this node for event
-        node.setValue(eventName, callback)
-
         # store the global registry on the document
         @storage.setValue(document, 'registry', globalRegistry)
+
+    # store callback on this node for event
+    node.setValue(eventName, callback)
 
     return
 
@@ -122,11 +123,14 @@ initialize = (bindingData, node) ->
 
     return
 
-cleanup = (bindingData, node) ->
+cleanup = (node) ->
     registry = @storage.getValue(node, 'registry') ? {}
 
     for eventName, binding of registry
         node.setValue(eventName, null)
         node.removeEventListener(eventName, binding)
+        delete registry[eventName]
+
+    @storage.setValue(node, 'registry', registry)
 
 qd.registerBindingHandler(HANDLER_NAME, { initialize, cleanup })
