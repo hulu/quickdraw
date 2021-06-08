@@ -8,7 +8,7 @@
 #
 #   The default form takes a map of event types to handler functions. Unlike
 #   normal listening each DOM node does not have listeners attached and instead
-#   only singular global listeners are registered on the document For backwards
+#   only singular global listeners are registered on the document. For backwards
 #   compatibility reasons these handlers use the capture phase of the event
 #   lifecycle and stop event propogation when events occur.
 #
