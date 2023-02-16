@@ -103,6 +103,13 @@ gulp.task("compile", gulp.series("clean", ->
         .pipe(gulp.dest(BUILD_FOLDER))
 ))
 
+gulp.task("minify", gulp.series("compile", ->
+    return gulp.src("#{BUILD_FOLDER}/#{COMPILED_FILE}")
+        .pipe(uglify())
+        .pipe(rename(MINIFIED_FILE))
+        .pipe(gulp.dest(BUILD_FOLDER))
+))
+
 gulp.task("compile:coverage", gulp.series("clean", ->
     return gulp.src(PATHS.coffeeSource)
         .pipe(coffeeCov({
@@ -141,14 +148,7 @@ gulp.task("coverage", gulp.series("test:coverage", shell.task([
     "sleep 1 && genhtml #{LCOV_FILE} -o #{COVERAGE_FOLDER}"
 ])))
 
-gulp.task("minify", gulp.series("compile", ->
-    return gulp.src("#{BUILD_FOLDER}/#{COMPILED_FILE}")
-        .pipe(uglify())
-        .pipe(rename(MINIFIED_FILE))
-        .pipe(gulp.dest(BUILD_FOLDER))
-))
-
-gulp.task("release:organize", gulp.series("test", ->
+gulp.task("release:organize", gulp.series("test", "minify", ->
     return gulp.src(["#{BUILD_FOLDER}/#{COMPILED_FILE}", "#{BUILD_FOLDER}/#{MINIFIED_FILE}", PATHS.typeDeclaration])
         .pipe(getHeaderAddition())
         .pipe(gulp.dest(RELEASE_FOLDER))
