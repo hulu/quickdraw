@@ -92,7 +92,7 @@ gulp.task("clean", ->
     return del(CLEAN_UP)
 )
 
-gulp.task("compile", ["clean"], ->
+gulp.task("compile", gulp.series("clean", ->
     source = PATHS.coffeeSource
     if args.debug
         source.push("src/debug/**.coffee")
@@ -101,25 +101,32 @@ gulp.task("compile", ["clean"], ->
         .pipe(coffee())
         .pipe(rename(COMPILED_FILE))
         .pipe(gulp.dest(BUILD_FOLDER))
-)
+))
 
-gulp.task("compile:coverage", ["clean"], ->
+gulp.task("minify", gulp.series("compile", ->
+    return gulp.src("#{BUILD_FOLDER}/#{COMPILED_FILE}")
+        .pipe(uglify())
+        .pipe(rename(MINIFIED_FILE))
+        .pipe(gulp.dest(BUILD_FOLDER))
+))
+
+gulp.task("compile:coverage", gulp.series("clean", ->
     return gulp.src(PATHS.coffeeSource)
         .pipe(coffeeCov({
             bare : true
         }))
         .pipe(concat(COMPILED_FILE))
         .pipe(gulp.dest(BUILD_FOLDER))
-)
+))
 
-gulp.task("test", ["clean", "compile"], ->
+gulp.task("test", gulp.series("clean", "compile", ->
     return gulp.src(PATHS.tests, { read : false })
         .pipe(mocha({
             reporter : "spec"
         }))
-)
+))
 
-gulp.task("test:coverage", ["clean", "compile:coverage"], ->
+gulp.task("test:coverage", gulp.series("clean", "compile:coverage", ->
     return gulp.src(PATHS.tests, { read : false })
         .pipe(mocha({
             reporter : "mocha-multi"
@@ -135,20 +142,13 @@ gulp.task("test:coverage", ["clean", "compile:coverage"], ->
                 }
             }
         }))
-)
+))
 
-gulp.task("coverage", ["test:coverage"], shell.task([
+gulp.task("coverage", gulp.series("test:coverage", shell.task([
     "sleep 1 && genhtml #{LCOV_FILE} -o #{COVERAGE_FOLDER}"
-]))
+])))
 
-gulp.task("minify", ["compile"], ->
-    return gulp.src("#{BUILD_FOLDER}/#{COMPILED_FILE}")
-        .pipe(uglify())
-        .pipe(rename(MINIFIED_FILE))
-        .pipe(gulp.dest(BUILD_FOLDER))
-)
-
-gulp.task("release:organize", ["test"], ->
+gulp.task("release:organize", gulp.series("test", "minify", ->
     return gulp.src(["#{BUILD_FOLDER}/#{COMPILED_FILE}", "#{BUILD_FOLDER}/#{MINIFIED_FILE}", PATHS.typeDeclaration])
         .pipe(getHeaderAddition())
         .pipe(gulp.dest(RELEASE_FOLDER))
@@ -156,9 +156,9 @@ gulp.task("release:organize", ["test"], ->
             message: "All tests have passed, do you want to publish this to npm?",
             default: false
         }))
-)
+))
 
-gulp.task("release", ["release:organize"], (cb) ->
+gulp.task("release", gulp.series("release:organize", (cb) ->
     pkg = require("./package.json")
     npm.load(pkg, (err) ->
         return cb(err) if err
@@ -172,9 +172,9 @@ gulp.task("release", ["release:organize"], (cb) ->
         # publish the repository
         npm.commands.publish(cb)
     )
-)
+))
 
-gulp.task("install", ["clean", "compile"], ->
+gulp.task("install", gulp.series("clean", "compile", ->
     unless args.dir?
         console.error("No directory specified for installation, use --dir flag")
         process.exit(1)
@@ -183,6 +183,6 @@ gulp.task("install", ["clean", "compile"], ->
     return gulp.src(["#{BUILD_FOLDER}/#{COMPILED_FILE}", PATHS.typeDeclaration])
         .pipe(getHeaderAddition(true))
         .pipe(gulp.dest(args.dir))
-)
+))
 
-gulp.task("default", ["clean", "compile"])
+gulp.task("default", gulp.series("clean", "compile"))
