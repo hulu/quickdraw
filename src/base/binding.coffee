@@ -210,7 +210,7 @@ qdInternal.binding = {
         handlers = qdInternal.storage.getInternalValue(domNode, 'handlers')
         for handler in qdInternal.state.binding.order
             # only run the handler if it has been previously marked as dirty
-            continue unless handlers[handler]
+            continue unless handlers.hasOwnProperty(handler)
 
             # get the update method for the handler
             update = qdInternal.handlers.getUpdate(handler)
@@ -238,9 +238,9 @@ qdInternal.binding = {
         # trigger the cleanups for any applied handlers
         # go backwards through the dependency order to allow dependent handlers
         # to cleanup before their precursor deletes necessary state
-        boundHandlers = qdInternal.storage.getInternalValue(domNode, 'handlers') ? []
+        boundHandlers = qdInternal.storage.getInternalValue(domNode, 'handlers') ? {}
         for handler in qdInternal.state.binding.order by -1
-            continue unless boundHandlers[handler]?
+            continue unless boundHandlers.hasOwnProperty(handler)
 
             # cleanups only get the dom node
             cleanup = qdInternal.handlers.getCleanup(handler)
