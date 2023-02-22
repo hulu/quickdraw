@@ -159,13 +159,13 @@ gulp.task("release:organize", gulp.series("test", "minify", ->
         }))
 ))
 
-gulp.task("release:bump", ->
+gulp.task("release:version", ->
     return gulp.src("./package.json")
         .pipe(bump({ type: args.type }))
         .pipe(gulp.dest("./"))
 )
 
-gulp.task("release", gulp.series("release:bump", "release:organize", (cb) ->
+gulp.task("release", gulp.series("release:organize", (cb) ->
     pkg = require("./package.json")
     npm.load(pkg, (err) ->
         return cb(err) if err

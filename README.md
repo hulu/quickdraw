@@ -36,9 +36,11 @@ This will run the `gulp test:coverage` command and then take the
 output coverage reports and use the systems 'genhtml' command to
 produce a browsable HTML page displaying coverage information per file.
 
+### `gulp release:version`
+This will increment the package version. By default it will increment the patch portion of the version number, but you can supply the `type` argument and provide a value of `major`, `minor`, or `patch` to the command (e.g. `gulp release:version --type major`) to force a different release type.
+
 ### `gulp release`
-The release command will build the library, run the test suite, and if all tests pass will up the version found in package.json and finally publish the library to npm. By default it will increment the patch
-portion of the version number but you can append 'major', 'minor', or 'patch' to the command (ex `gulp release:major`) to force a different release type.
+The release command will build the library, run the test suite, and if all tests pass will publish the library to npm.
 
 ### `gulp`
 The default action is to clean the source directory and compile the library again.
