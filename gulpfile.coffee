@@ -8,6 +8,7 @@ npmlog    = require("npm/node_modules/npmlog")
 
 # gulp related includes
 gulp      = require("gulp")
+bump      = require("gulp-bump")
 coffee    = require("gulp-coffee")
 coffeeCov = require("gulp-coffee-coverage")
 concat    = require("gulp-concat")
@@ -157,6 +158,12 @@ gulp.task("release:organize", gulp.series("test", "minify", ->
             default: false
         }))
 ))
+
+gulp.task("release:version", ->
+    return gulp.src("./package.json")
+        .pipe(bump({ type: args.type }))
+        .pipe(gulp.dest("./"))
+)
 
 gulp.task("release", gulp.series("release:organize", (cb) ->
     pkg = require("./package.json")
