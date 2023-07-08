@@ -29,12 +29,12 @@
     "gulp-rename": "~1.2.2",
     "gulp-shell": "~0.5.1",
     "gulp-uglify": "^1.5.4",
-    "jsdom": "~7.0.2",
+    "jsdom": "~22.1.0",
     "minimist": "~1.2.0",
     "mocha": "~2.3.3",
     "mocha-lcov-reporter": "1.0.0",
     "mocha-multi": "~0.7.2",
-    "npm": "^6.0.0",
+    "npm": "^9.8.0",
     "sinon": "~1.17.2"
   }
 }
